@@ -81,6 +81,7 @@ library
                         , exceptions         == 0.8.*
                         , tagsoup            >= 0.13 && < 0.15
                         , filepath           >= 1 && < 2
+                        , attoparsec         >= 0.13 && < 0.14
 
    if flag(newtime)
       Build-Depends:    time >= 1.5 && < 1.7

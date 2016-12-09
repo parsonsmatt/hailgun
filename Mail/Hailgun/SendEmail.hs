@@ -41,7 +41,7 @@ toEmailParts message = params ++ attachmentParts
 
 toSimpleEmailParts :: HailgunMessage -> [(BC.ByteString, BC.ByteString)]
 toSimpleEmailParts message =
-   [ (BC.pack "from", toByteString . messageFrom $ message)
+   [ (BC.pack "from", messageFrom message)
    , (BC.pack "subject", T.encodeUtf8 $ messageSubject message)
    ] ++ to
    ++ cc
@@ -56,8 +56,8 @@ toSimpleEmailParts message =
       fromContent t@(TextOnly _) = [ (BC.pack "text", textContent t) ]
       fromContent th@(TextAndHTML {}) = (BC.pack "html", htmlContent th) : fromContent (TextOnly . textContent $ th)
 
-      convertEmails :: BC.ByteString -> [EmailAddress] -> [(BC.ByteString, BC.ByteString)]
-      convertEmails prefix = fmap ((,) prefix . toByteString)
+      convertEmails :: BC.ByteString -> [VerifiedEmailAddress] -> [(BC.ByteString, BC.ByteString)]
+      convertEmails prefix = fmap ((,) prefix)
 
 -- TODO replace with MailgunSendResponse
 -- | The response to an email being accepted by the Mailgun API.

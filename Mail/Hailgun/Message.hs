@@ -3,12 +3,16 @@ module Mail.Hailgun.Message
     ) where
 
 import           Control.Applicative
-import qualified Data.ByteString.Char8            as BC
-import           Data.List                        (find)
+import           Data.Either                        (either)
+import qualified Data.ByteString.Char8              as BC
+import qualified Data.Text                          as T
+import           Data.Text.Encoding                 (encodeUtf8, decodeUtf8)
+import           Data.List                          (find)
 import           Mail.Hailgun.Attachment.Internal
 import           Mail.Hailgun.AttachmentsSearch
 import           Mail.Hailgun.Internal.Data
 import           Text.Email.Validate
+import           Data.Attoparsec.Text
 
 -- | A method to construct a HailgunMessage. You require a subject, content, From address and people
 -- to send the email to and it will give you back a valid Hailgun email message. Or it will error
@@ -21,10 +25,10 @@ hailgunMessage
    -> [Attachment] -- ^ The attachments that you want to attach to the email; standard or inline.
    -> Either HailgunErrorMessage HailgunMessage -- ^ Either an error while trying to create a valid message or a valid message.
 hailgunMessage subject content sender recipients simpleAttachments = do
-   from  <- validate sender
-   to    <- mapM validate (recipientsTo recipients)
-   cc    <- mapM validate (recipientsCC recipients)
-   bcc   <- mapM validate (recipientsBCC recipients)
+   from  <- validateRecipient sender
+   to    <- mapM validateRecipient (recipientsTo recipients)
+   cc    <- mapM validateRecipient (recipientsCC recipients)
+   bcc   <- mapM validateRecipient (recipientsBCC recipients)
    attachments <- attachmentsInferredFromMessage content cleanAttachments
    return HailgunMessage
       { messageSubject = subject
@@ -37,6 +41,17 @@ hailgunMessage subject content sender recipients simpleAttachments = do
       }
    where
       cleanAttachments = fmap cleanAttachmentFilePath simpleAttachments
+
+extractEmail :: T.Text -> Either String T.Text
+extractEmail = parseOnly
+   $ many (satisfy (/= '<')) *> char '<' *> (T.pack <$> many (satisfy (/= '>')) <* char '>')
+   <|> T.pack <$> many anyChar
+
+validateEmail :: T.Text -> Either String EmailAddress
+validateEmail e = validate . encodeUtf8 =<< extractEmail e
+
+validateRecipient :: UnverifiedEmailAddress -> Either String VerifiedEmailAddress
+validateRecipient ue = ue <$ validateEmail (decodeUtf8 ue)
 
 attachmentsInferredFromMessage :: MessageContent -> [Attachment] -> Either String [SpecificAttachment]
 attachmentsInferredFromMessage mContent simpleAttachments =

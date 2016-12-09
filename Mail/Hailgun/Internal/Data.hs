@@ -5,6 +5,7 @@ module Mail.Hailgun.Internal.Data
     , MessageSubject
     , MessageContent(..)
     , UnverifiedEmailAddress
+    , VerifiedEmailAddress
     , MessageRecipients(..)
     , emptyMessageRecipients
     , HailgunErrorMessage
@@ -33,6 +34,7 @@ import           System.Locale        (defaultTimeLocale)
 #endif
 
 type UnverifiedEmailAddress = B.ByteString -- ^ Represents an email address that is not yet verified.
+type VerifiedEmailAddress = B.ByteString -- ^ Represents an email address that has been verified.
 type MessageSubject = T.Text -- ^ Represents a message subject.
 
 -- | A generic error message that is returned by the Hailgun library.
@@ -79,10 +81,10 @@ data MessageContent
 data HailgunMessage = HailgunMessage
    { messageSubject     :: MessageSubject
    , messageContent     :: MessageContent
-   , messageFrom        :: TEV.EmailAddress
-   , messageTo          :: [TEV.EmailAddress]
-   , messageCC          :: [TEV.EmailAddress]
-   , messageBCC         :: [TEV.EmailAddress]
+   , messageFrom        :: VerifiedEmailAddress
+   , messageTo          :: [VerifiedEmailAddress]
+   , messageCC          :: [VerifiedEmailAddress]
+   , messageBCC         :: [VerifiedEmailAddress]
    , messageAttachments :: [SpecificAttachment]
    }
    deriving (Show)
