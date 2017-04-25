@@ -6,6 +6,7 @@
 module Mail.Hailgun
    ( sendEmail
    , hailgunMessage
+   , hailgunMessageWReplyTo
    , addAttachment
    , HailgunContext(..)
    , HailgunMessage
