@@ -1,5 +1,6 @@
 module Mail.Hailgun.Message
     ( hailgunMessage
+    , hailgunMessageWReplyTo
     ) where
 
 import           Control.Applicative
@@ -37,18 +38,19 @@ hailgunMessage subject content sender recipients simpleAttachments = do
       , messageTo = to
       , messageCC = cc
       , messageBCC = bcc
+      , messageReplyTo = Nothing
       , messageAttachments = attachments
       }
    where
       cleanAttachments = fmap cleanAttachmentFilePath simpleAttachments
 
 hailgunMessageWReplyTo
-    :: HailgunMessage
-    -> UnverifiedEmailAddress
+    :: Maybe UnverifiedEmailAddress
+    -> HailgunMessage
     -> Either HailgunErrorMessage HailgunMessage
-hailgunMessageWReplyTo hailgunMessage replyTo = do
-   repl <- validateRecipient replyTo
-   return hailgunMessage{ messageReplyTo = Just repl }
+hailgunMessageWReplyTo replyTo hailgunMessage = do
+   repl <- maybe (Right Nothing) (either Left (Right . Just) . validateRecipient) replyTo
+   return hailgunMessage{ messageReplyTo = repl }
 
 extractEmail :: T.Text -> Either String T.Text
 extractEmail = parseOnly
