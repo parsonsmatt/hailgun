@@ -42,6 +42,14 @@ hailgunMessage subject content sender recipients simpleAttachments = do
    where
       cleanAttachments = fmap cleanAttachmentFilePath simpleAttachments
 
+hailgunMessageWReplyTo
+    :: HailgunMessage
+    -> UnverifiedEmailAddress
+    -> Either HailgunErrorMessage HailgunMessage
+hailgunMessageWReplyTo hailgunMessage replyTo = do
+   repl <- validateRecipient replyTo
+   return hailgunMessage{ messageReplyTo = Just repl }
+
 extractEmail :: T.Text -> Either String T.Text
 extractEmail = parseOnly
    $ many (satisfy (/= '<')) *> char '<' *> (T.pack <$> many (satisfy (/= '>')) <* char '>')
