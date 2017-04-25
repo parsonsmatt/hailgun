@@ -132,7 +132,7 @@ data AttachmentType = Attached | Inline deriving (Eq, Show)
 -- toBob = emptyMessageRecipients { recipientsTo = [\"bob\@bob.test\"] }
 -- @
 emptyMessageRecipients :: MessageRecipients
-emptyMessageRecipients = MessageRecipients [] [] [] Nothing
+emptyMessageRecipients = MessageRecipients [] [] []
 
 -- | A collection of unverified email recipients separated into the To, CC and BCC groupings that
 -- email supports.
@@ -140,7 +140,6 @@ data MessageRecipients = MessageRecipients
    { recipientsTo      :: [UnverifiedEmailAddress] -- ^ The people to email directly.
    , recipientsCC      :: [UnverifiedEmailAddress] -- ^ The people to \"Carbon Copy\" into the email. Honestly, why is that term not deprecated yet?
    , recipientsBCC     :: [UnverifiedEmailAddress] -- ^ The people to \"Blind Carbon Copy\" into the email. There really needs to be a better name for this too.
-   , recipientsReplyTo :: Maybe UnverifiedEmailAddress -- ^ The \"Reply to\" for the email.
    }
    deriving (Show)
 
