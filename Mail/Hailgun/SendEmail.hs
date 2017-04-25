@@ -32,7 +32,7 @@ sendEmail
    -> IO (Either HailgunErrorResponse HailgunSendResponse) -- ^ The result of the sent email. Either a sent email or a successful send.
 sendEmail context message = do
    request <- postRequest url context (toEmailParts message)
-   response <- withManager tlsManagerSettings (httpLbs (request{ requestHeaders = applyReplyTo (messageReplyTo $ message) }))
+   response <- withManager tlsManagerSettings (httpLbs (request{ requestHeaders = requestHeaders request ++ applyReplyTo (messageReplyTo $ message) }))
    return $ parseResponse response
    where
       url = mailgunApiPrefixContext context ++ "/messages"
