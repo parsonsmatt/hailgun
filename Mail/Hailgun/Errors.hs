@@ -7,10 +7,9 @@ module Mail.Hailgun.Errors
     , mapError
     ) where
 
-import           Control.Applicative
-import           Control.Monad       (mzero)
+import           Control.Monad (mzero)
 import           Data.Aeson
-import qualified Data.Text           as T
+import qualified Data.Text     as T
 
 -- TODO make this Hailgun specific and different for the Mailgun api. That way there is the correct
 -- separation of concerns.

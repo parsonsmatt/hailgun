@@ -2,7 +2,6 @@ module Mail.Hailgun.Message
     ( hailgunMessage
     ) where
 
-import           Control.Applicative
 import qualified Data.ByteString.Char8            as BC
 import           Data.List                        (find)
 import           Mail.Hailgun.Attachment.Internal
@@ -59,7 +58,7 @@ notInSpecific simpleAttachments specificAttachments =
 findAttachmentForImage :: [Attachment] -> InlineImage -> Either String SpecificAttachment
 findAttachmentForImage attachments image =
    case find (`attachmentForInlineImage` image) attachments of
-      Nothing -> Left . missingInlineImageErrorMessage $ image
+      Nothing         -> Left . missingInlineImageErrorMessage $ image
       Just attachment -> Right . toInlineAttachment $ attachment
 
 missingInlineImageErrorMessage :: InlineImage -> String

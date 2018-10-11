@@ -28,26 +28,18 @@ toQueryParams = fmap (second Just)
 
 getRequest :: (MonadThrow m) => String -> HailgunContext -> [(BC.ByteString, Maybe BC.ByteString)] -> m NC.Request
 getRequest url context queryParams = do
-   initRequest <- NC.parseUrl url
+   initRequest <- NC.parseUrlThrow url
    let request = appEndo (applyHailgunAuth context) $
          initRequest
             { NC.method = NM.methodGet
-#if MIN_VERSION_http_client(0,5,0)
-#else
-            , NC.checkStatus = ignoreStatus
-#endif
             }
    return $ NC.setQueryString queryParams request
 
 postRequest :: (MonadThrow m, MonadIO m) => String -> HailgunContext -> [Part] -> m NC.Request
 postRequest url context parts = do
-   initRequest <- NC.parseUrl url
+   initRequest <- NC.parseUrlThrow url
    let request = initRequest
          { NC.method = NM.methodPost
-#if MIN_VERSION_http_client(0,5,0)
-#else
-         , NC.checkStatus = ignoreStatus
-#endif
          }
    requestWithBody <- formDataBody parts request
    --requestWithBody <- encodeFormData formParams request
@@ -76,6 +68,3 @@ parseResponse response = statusToResponse . NT.statusCode . NC.responseStatus $ 
 
 responseDecode :: (FromJSON a) => NC.Response BLC.ByteString -> Either HailgunErrorResponse a
 responseDecode = mapError . eitherDecode . NC.responseBody
-
-ignoreStatus :: a -> b -> c -> Maybe d
-ignoreStatus _ _ _ = Nothing

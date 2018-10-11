@@ -15,13 +15,12 @@ module Mail.Hailgun.Internal.Data
     , AttachmentType(..)
     ) where
 
-import           Control.Applicative
 import           Data.Aeson
 import qualified Data.ByteString      as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text            as T
 import           Data.Time.Clock      (UTCTime (..))
-import           Data.Time.Format     (ParseTime (..), parseTime)
+import           Data.Time.Format     (ParseTime (..), parseTimeM)
 import           Data.Time.LocalTime  (zonedTimeToUTC)
 import qualified Network.HTTP.Client  as NHC
 import qualified Text.Email.Validate  as TEV
@@ -151,13 +150,9 @@ newtype HailgunTime = HailgunTime UTCTime
 -- Example Input: 'Thu, 13 Oct 2011 18:02:00 GMT'
 instance FromJSON HailgunTime where
    parseJSON = withText "HailgunTime" $ \t ->
-      case parseTime defaultTimeLocale "%a, %d %b %Y %T %Z" (T.unpack t) of
+      case parseTimeM True defaultTimeLocale "%a, %d %b %Y %T %Z" (T.unpack t) of
          Just d -> pure d
          _      -> fail "could not parse Mailgun Style date"
 
 instance ParseTime HailgunTime where
-#if MIN_VERSION_time(1,6,0)
    buildTime l input = HailgunTime . zonedTimeToUTC <$> buildTime l input
-#else
-   buildTime l = HailgunTime . zonedTimeToUTC . buildTime l
-#endif
