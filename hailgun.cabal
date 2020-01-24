@@ -74,7 +74,7 @@ library
                         , aeson              >= 0.8 && < 1.5
                         , text               == 1.2.*
                         , transformers       >= 0.3 && < 0.6
-                        , http-client        >= 0.4 && < 0.6
+                        , http-client        >= 0.4 && < 0.7
                         , http-client-tls    >= 0.2 && < 0.4
                         , email-validate     >= 2.0 && <2.4
                         , http-types         >= 0.8 && < 0.13
