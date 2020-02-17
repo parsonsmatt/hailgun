@@ -19,10 +19,12 @@ module Mail.Hailgun.Internal.Data
 import           Data.Aeson
 import qualified Data.ByteString      as B
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Proxy           as Proxy
 import qualified Data.Text            as T
 import           Data.Time.Clock      (UTCTime (..))
-import           Data.Time.Format     (ParseTime (..), parseTimeM)
-import           Data.Time.LocalTime  (zonedTimeToUTC)
+import           Data.Time.Format.Internal (ParseTime (..))
+import           Data.Time.Format     (parseTimeM)
+import           Data.Time.LocalTime  (zonedTimeToUTC, ZonedTime)
 import qualified Network.HTTP.Client  as NHC
 
 #if MIN_VERSION_time(1,5,0)
@@ -158,6 +160,9 @@ instance FromJSON HailgunTime where
 
 instance ParseTime HailgunTime where
 #if MIN_VERSION_time(1,6,0)
+#  if MIN_VERSION_time(1,9,0)
+   parseTimeSpecifier _ = parseTimeSpecifier (Proxy.Proxy :: Proxy.Proxy ZonedTime)
+#  endif
    buildTime l input = HailgunTime . zonedTimeToUTC <$> buildTime l input
 #else
    buildTime l = HailgunTime . zonedTimeToUTC . buildTime l
