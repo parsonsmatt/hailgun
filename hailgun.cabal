@@ -84,7 +84,7 @@ library
                         , attoparsec         >= 0.13 && < 0.14
 
    if flag(newtime)
-      Build-Depends:    time >= 1.5 && < 1.9
+      Build-Depends:    time >= 1.5 && < 1.10
    else
       Build-Depends:    time >= 1.2 && < 1.5, old-locale == 1.*
 
